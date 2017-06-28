@@ -32,7 +32,33 @@ int main (int argc, char* argv[]) {
     const unsigned int size = h_a.size();
     std::vector<float> h_results(size);
 
+    try {
+        cl::Context context(DEVICE);
 
+        cl::Program program(context, readFile("kernel.cl"), true);
+
+        auto kernel = cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer, int>(program, "d_add_matrices");
+
+        cl::Buffer d_a = cl::Buffer(context, begin(h_a), end(h_a), true);
+        cl::Buffer d_b = cl::Buffer(context, begin(h_b), end(h_b), true);
+        cl::Buffer d_results = cl::Buffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * size);
+
+        cl::CommandQueue queue(context);
+        kernel(cl::EnqueueArgs(queue, cl::NDRange(size)), d_a, d_b, d_results, size);
+
+        queue.finish();
+
+        cl::copy(queue, d_results, h_results.begin(), h_results.end());
+    } catch (cl::Error err) {
+        std::cout << "Exception\n";
+        std::cerr
+                << "ERROR: "
+                << err.what()
+                << "("
+                << err.err()
+                << ")"
+                << std::endl;
+    }
 }
 
 /**
