@@ -49,6 +49,18 @@ int main (int argc, char* argv[]) {
         queue.finish();
 
         cl::copy(queue, d_results, h_results.begin(), h_results.end());
+
+        // Unflatten and print the resulting matrix
+        for (unsigned int i = 0; i < size; i++) {
+            std::cout << h_results[i];
+            if ((i + 1) % num_columns == 0) {
+                std::cout << std::endl;
+            } else {
+                std::cout << ',';
+            }
+        };
+        std::cout << std::endl;
+
     } catch (cl::Error err) {
         std::cout << "Exception\n";
         std::cerr
@@ -71,7 +83,18 @@ std::vector<float> readMatrixFromFile (std::string file_name) {
     // n5,n6,n7,n8
     // n9,...
     // (where line breaks are \n)
-    std::string raw_matrix = readFile(file_name);
+    std::string raw_matrix;
+    std::ifstream file(file_name);
+
+    std::string line;
+    while (std::getline(file, line)) {
+        raw_matrix += line;
+        // Add a comma so that we can more easily flatten the matrix
+        // and handle \n
+        raw_matrix += ",";
+    }
+    // Remove the last trailing comma
+    raw_matrix.pop_back();
 
     // Flatten the matrix by splitting the strings using the , separator
     // {n1,n2,n3,n4,n5,n6,n7,n8,n9...}
