@@ -18,11 +18,10 @@ std::vector<float> readMatrixFromFile (std::string file_name);
 
 int main (int argc, char* argv[]) {
     // Handle input arguments
-    // ./main <first matrix filename> <second matrix filename> <num columns> <num rows>
+    // ./main <first matrix filename> <second matrix filename> <num columns>
     std::string matrix_a_filename(argv[1]);
     std::string matrix_b_filename(argv[2]);
     int num_columns = atoi(argv[3]);
-    int num_rows = atoi(argv[4]);
 
     // Set up the input matrices
     std::vector<float> h_a = readMatrixFromFile(matrix_a_filename);
